@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Birthday Greeting Card</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet" />
+
+<style>
+* {margin:0; padding:0; box-sizing:border-box; font-family: 'Poppins', sans-serif;}
+html, body {height:100%; overflow:hidden; background: linear-gradient(rgba(255,182,213,0.5), rgba(255,182,213,0.5)), url('background.jpg') no-repeat center center; background-size: cover; display: flex; justify-content: center; align-items: center;}
+
+/* Stars & Hearts */
+.star { position: absolute; color: #ffcc00; font-size: 22px; animation: floatUp 10s linear infinite; opacity: 0.9; z-index: 1; }
+.heart { position: absolute; color: #ff4d6d; font-size: 28px; opacity: 0.8; z-index: 1; animation: floatUpHearts linear infinite; }
+@keyframes floatUp { 0% { transform: translateY(100vh) scale(0.8); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(-10vh) scale(1.1); opacity: 0; } }
+@keyframes floatUpHearts { 0% { transform: translateY(100vh) translateX(0) scale(0.5); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(-10vh) translateX(30px) scale(1); opacity: 0; } }
+
+/* Container / Card Layout */
+.container { width:1100px; max-width:95%; display:flex; justify-content:space-between; align-items:center; padding:40px; position:relative; z-index:2; background: rgba(255,255,255,0.05); border-radius:30px; box-shadow: 0 15px 50px rgba(0,0,0,0.4); backdrop-filter: blur(5px); }
+.left { max-width:520px; }
+
+/* Shiny Birthday Text */
+.left h1 {
+  font-size: 70px; line-height:1.4;
+  background: linear-gradient(45deg, #ff4d6d, #ff66b2, #ffcc00);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  text-shadow:0 0 15px rgba(255,77,109,0.6), 0 0 25px rgba(255,182,213,0.5);
+  animation: glow 2s ease-in-out infinite alternate, shine 3s linear infinite;
+  border: 4px solid #ff66b2; border-radius: 15px; padding: 10px 20px; display: inline-block;
+}
+@keyframes glow { from {text-shadow:0 0 15px rgba(255,77,109,0.5), 0 0 25px rgba(255,182,213,0.3);} to {text-shadow:0 0 35px rgba(255,77,109,0.9), 0 0 50px rgba(255,182,213,0.6);} }
+@keyframes shine { 0% { background-position: -200px; } 100% { background-position: 200px; } }
+
+.date-badge { display:inline-block; background:#ff4d6d; color:white; padding:12px 30px; border-radius:30px; margin:25px 0; font-weight:600; font-size:18px; }
+.button { display:inline-block; background:#ff66b2; padding:14px 30px; border-radius:30px; text-decoration:none; color:white; font-weight:600; transition:0.3s; cursor:pointer; }
+.button:hover { background:#ff4d6d; transform:scale(1.05); }
+
+.right { text-align:center; position: relative; }
+.profile { width:380px; height:380px; border-radius:50%; border:12px solid #ff8fa3; overflow:hidden; margin:auto; box-shadow:0 15px 40px rgba(0,0,0,0.2); transition:0.4s; }
+.profile:hover { transform:scale(1.05); }
+.profile img { width:100%; height:100%; object-fit:cover; }
+.name-tag { margin-top:25px; display:inline-block; background:#ff4d6d; padding:12px 35px; border-radius:30px; color:white; font-weight:600; font-size:20px; }
+
+/* Balloons */
+.balloon { width:70px; height:90px; border-radius:50%; position:absolute; animation: floatBalloon 5s ease-in-out infinite; z-index:1; }
+.balloon:after { content:''; width:2px; height:40px; background:#555; position:absolute; left:50%; bottom:-40px; }
+.blue{background:#4da6ff;} .pink{background:#ff66b2;} .yellow{background:#ffd633;}
+.balloon1{top:-50px; right:20px;} .balloon2{bottom:20px; right:-60px;} .balloon3{top:60px; left:-60px;}
+@keyframes floatBalloon{0%{transform:translateY(0);}50%{transform:translateY(-30px);}100%{transform:translateY(0);}}
+
+/* Responsive */
+@media(max-width:900px){.container{flex-direction:column; text-align:center;}.left{margin-bottom:40px;}.profile{width:260px; height:260px;}.left h1{font-size:45px;}}
+
+/* ===== Love Letter Book ===== */
+#letterModal { position: fixed; top:0; left:0; width:100%; height:100%; display:none; justify-content:center; align-items:center; background: rgba(0,0,0,0.6); z-index:10; perspective:2500px; }
+.book-container { width:1000px; max-width:95%; height:550px; position:relative; transform-style: preserve-3d; }
+.book { width:100%; height:100%; position:relative; transform-style: preserve-3d; }
+
+/* Covers with heart patterns */
+.left-page, .right-page-cover {
+  width:50%; height:100%; position:absolute; top:0; z-index:3;
+  transform-style: preserve-3d; transition: transform 1s ease; /* faster */
+  border-radius:15px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+  background: black;
+  background-image: radial-gradient(red 6%, transparent 7%), radial-gradient(red 6%, transparent 7%);
+  background-position: 0 0, 20px 20px;
+  background-size: 40px 40px;
+}
+.left-page { left:0; transform-origin:left; border-right: 2px solid red; }
+.right-page-cover { right:0; transform-origin:right; border-left: 2px solid red; }
+.left-page.open { transform: rotateY(-180deg) translateZ(2px); }
+.right-page-cover.open { transform: rotateY(180deg) translateZ(2px); }
+
+/* Inner pages with curl */
+.left-inner, .right-inner {
+  position:absolute; top:0; width:50%; height:100%; padding:40px; opacity:0; border-radius:10px;
+  background: linear-gradient(to bottom, #fff0f5, #ffe6f0);
+  box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
+  transition: opacity 0.8s ease 0.5s, transform 1s ease; /* faster */
+}
+.left-inner { left:0; display:flex; justify-content:center; align-items:center; transform: perspective(1000px) rotateY(-5deg) rotateX(2deg); }
+.right-inner { right:0; overflow-y:auto; transform: perspective(1000px) rotateY(5deg) rotateX(-2deg); }
+.left-inner.show { opacity:1; transform: perspective(1000px) rotateY(0deg) rotateX(0deg); }
+.right-inner.show { opacity:1; transform: perspective(1000px) rotateY(0deg) rotateX(0deg); }
+.left-inner img { width:80%; height:80%; object-fit:cover; border-radius:15px; box-shadow:0 5px 20px rgba(0,0,0,0.2); }
+.right-inner .happy-text { font-size:36px; font-weight:800; background: linear-gradient(45deg, #ff4d6d, #ff66b2); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:25px; }
+.right-inner .message-area { font-size:19px; line-height:1.7; color:#333; }
+.book-container::after { content:''; position:absolute; bottom:-40px; left:50%; transform: translateX(-50%); width:90%; height:50px; background: rgba(0,0,0,0.2); filter: blur(20px); z-index:0; border-radius:50%; }
+.close-btn { position:absolute; top:-20px; right:-20px; font-size:45px; font-weight:bold; color:#ff4d6d; cursor:pointer; z-index:10; }
+</style>
+</head>
+<body>
+
+<!-- Stars & Hearts -->
+<div class="star" style="left:5%; animation-delay:0s;">⭐</div>
+<div class="star" style="left:20%; animation-delay:2s;">⭐</div>
+<div class="star" style="left:40%; animation-delay:4s;">⭐</div>
+<div class="star" style="left:60%; animation-delay:1s;">⭐</div>
+<div class="star" style="left:80%; animation-delay:3s;">⭐</div>
+
+<div class="heart" style="left:10%; animation-duration: 8s; animation-delay:0s;">❤️</div>
+<div class="heart" style="left:30%; animation-duration: 10s; animation-delay:2s;">❤️</div>
+<div class="heart" style="left:50%; animation-duration: 12s; animation-delay:4s;">❤️</div>
+<div class="heart" style="left:70%; animation-duration: 9s; animation-delay:1s;">❤️</div>
+<div class="heart" style="left:85%; animation-duration: 11s; animation-delay:3s;">❤️</div>
+
+<!-- Card Container -->
+<div class="container">
+  <div class="left">
+    <h1>𝐻𝒶𝓅𝓅𝓎 𝐵𝒾𝓇𝓉𝒽𝒹𝒶𝓎 <br> 𝑀𝓎 𝐿💗𝓋𝑒</h1>
+    <div class="date-badge">28 Feb</div><br>
+    <div class="button" onclick="openLetter()">Open Love Letter 💌</div>
+  </div>
+
+  <div class="right">
+    <div class="profile"><img src="cake.jpeg" alt="Birthday Cake" /></div>
+    <div class="name-tag">Happy Cake Day, Love 💖</div>
+    <div class="balloon blue balloon1"></div>
+    <div class="balloon pink balloon2"></div>
+    <div class="balloon yellow balloon3"></div>
+  </div>
+</div>
+
+<!-- Love Letter Book -->
+<div id="letterModal">
+  <div class="book-container">
+    <div class="book">
+      <div class="left-page"></div>
+      <div class="right-page-cover"></div>
+
+      <div class="left-inner">
+        <img src="apoja.jpeg" alt="Birthday Image">
+      </div>
+      <div class="right-inner">
+        <div class="happy-text">Happy Birthday, Pooja! 🎉</div>
+        <div class="message-area">
+          <p>Happy Birthday my love ❤️🎂</p>
+          <p>I was honestly so excited for your birthday,<br>and today that special day has finally arrived ❤️<br>This day is just as special to me as you are.</p>
+          <p>I pray from my heart that you become very successful in life.<br>May you always be at the top in whatever you do.<br>May all your hard work bring you happiness and success.<br>May every single dream of yours come true one by one ✨<br>May the life you imagine become your reality.</p>
+          <p>May there never be any shortage of happiness in your life.<br>May every difficulty become small in front of your strength.<br>May you receive all the happiness in the world 💖</p>
+          <p>And one more thing…<br>I love you so, so much ❤️<br>You are my everything, my whole world.🧿🌏<br>My life feels incomplete without you.</p>
+          <p>Forever yours ❤️🧿💎</p>
+        </div>
+      </div>
+    </div>
+    <div class="close-btn" onclick="closeLetter()">&times;</div>
+  </div>
+</div>
+
+<script>
+function openLetter() {
+  const left = document.querySelector('.left-page');
+  const right = document.querySelector('.right-page-cover');
+  const leftInner = document.querySelector('.left-inner');
+  const rightInner = document.querySelector('.right-inner');
+
+  document.getElementById('letterModal').style.display = 'flex';
+
+  setTimeout(() => {
+    left.classList.add('open');
+    right.classList.add('open');
+  }, 100);
+
+  setTimeout(() => {
+    leftInner.classList.add('show');
+    rightInner.classList.add('show');
+  }, 1200);
+}
+
+function closeLetter() {
+  const left = document.querySelector('.left-page');
+  const right = document.querySelector('.right-page-cover');
+  const leftInner = document.querySelector('.left-inner');
+  const rightInner = document.querySelector('.right-inner');
+
+  leftInner.classList.remove('show');
+  rightInner.classList.remove('show');
+
+  setTimeout(() => {
+    left.classList.remove('open');
+    right.classList.remove('open');
+  }, 100);
+
+  setTimeout(() => {
+    document.getElementById('letterModal').style.display = 'none';
+  }, 1200);
+}
+</script>
+
+</body>
+</html>
